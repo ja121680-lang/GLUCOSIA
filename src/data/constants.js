@@ -346,6 +346,8 @@ export const STORAGE_KEYS = {
   language: 'app-language',
   device: 'linked-device',
   textSize: 'app-text-size',
+  pin: 'app-pin-hash',
+  biometricCredentialId: 'app-biometric-credential-id',
 };
 
 export const TEXT_SIZE_SCALE = {

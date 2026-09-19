@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, Bluetooth, Check, ChevronRight, FileText, Globe, HelpCircle, Loader2, Mail, Pencil, Phone, TestTube, Trash2 } from 'lucide-react';
+import { AlertTriangle, Bluetooth, Check, ChevronRight, FileText, Globe, HelpCircle, Loader2, Lock, Mail, Pencil, Phone, TestTube, Trash2 } from 'lucide-react';
 import { Modal } from '../components/shared/Modal';
 import { ProfileFields } from '../components/onboarding/ProfileFields';
 import { APP_LANGUAGES, DIABETES_TYPES, MEDICAL_CONDITIONS, SENSOR_BRANDS } from '../data/constants';
@@ -92,7 +92,7 @@ export function DeleteProfileConfirm({ onConfirm, onClose }) {
   );
 }
 
-export function PerfilView({ profile, device, language, onEditProfile, onChangeLanguage, onOpenDevice, onDeleteProfile, onExportHistory, onOpenLabStudies }) {
+export function PerfilView({ profile, device, language, onEditProfile, onChangeLanguage, onOpenDevice, onDeleteProfile, onExportHistory, onOpenLabStudies, onLock }) {
   const diabetesLabel = DIABETES_TYPES.find((tp) => tp.id === profile?.tipoDiabetes)?.label || '—';
   const avatarInitial = (profile?.nombre || '?').trim().charAt(0).toUpperCase();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -158,6 +158,17 @@ export function PerfilView({ profile, device, language, onEditProfile, onChangeL
         <div className="flex-1 text-left">
           <p className="text-sm font-semibold text-slate-900">{t('device', language)}</p>
           <p className="text-xs text-slate-400">{device ? device.label : 'Sin vincular'}</p>
+        </div>
+        <ChevronRight size={16} className="text-slate-300" />
+      </button>
+
+      <button type="button" onClick={onLock} className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0">
+          <Lock size={17} className="text-slate-400" />
+        </div>
+        <div className="flex-1 text-left">
+          <p className="text-sm font-semibold text-slate-900">Bloquear aplicación</p>
+          <p className="text-xs text-slate-400">Pide tu PIN o huella la próxima vez que abras Glucosia</p>
         </div>
         <ChevronRight size={16} className="text-slate-300" />
       </button>

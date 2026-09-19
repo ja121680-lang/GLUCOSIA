@@ -4,9 +4,11 @@ import { t } from '../../utils/i18n';
 import { WelcomeStep } from './WelcomeStep';
 import { CookiesStep } from './CookiesStep';
 import { ProfileFields } from './ProfileFields';
+import { PinStep } from './PinStep';
 
 export function OnboardingScreen({ onComplete, onLanguageChange }) {
   const [step, setStep] = useState('welcome');
+  const [pendingProfile, setPendingProfile] = useState(null);
   const [nombre, setNombre] = useState('');
   const [edad, setEdad] = useState('');
   const [telefono, setTelefono] = useState('');
@@ -25,11 +27,21 @@ export function OnboardingScreen({ onComplete, onLanguageChange }) {
 
   function handleFinish() {
     if (!nombre.trim()) { setError('Escribe tu nombre para continuar.'); return; }
-    onComplete({ nombre: nombre.trim(), edad, telefono, correo, tipoDiabetes, idioma, esHipertenso, condiciones, condicionOtro: condiciones.includes('otro') ? condicionOtro.trim() : '' });
+    setPendingProfile({ nombre: nombre.trim(), edad, telefono, correo, tipoDiabetes, idioma, esHipertenso, condiciones, condicionOtro: condiciones.includes('otro') ? condicionOtro.trim() : '' });
+    setStep('pin');
   }
 
   if (step === 'welcome') return <WelcomeStep onStart={() => setStep('cookies')} />;
   if (step === 'cookies') return <CookiesStep onAccept={() => setStep('form')} />;
+  if (step === 'pin') {
+    return (
+      <PinStep
+        title="Protege tu información"
+        subtitle="Crea un PIN de 4 dígitos para acceder a Glucosia. Es obligatorio para llevar tu registro de medicamentos."
+        onDone={(pinHash, biometricCredentialId) => onComplete(pendingProfile, pinHash, biometricCredentialId)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-amber-50 font-sans max-w-md mx-auto px-6 py-8 overflow-y-auto">

@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { HelpCircle, Loader2, Settings } from 'lucide-react';
 import { Toast } from './components/shared/Toast';
 import { SosModal } from './components/shared/SosModal';
+import { LockScreen } from './components/LockScreen';
 import { OnboardingScreen } from './components/onboarding/OnboardingScreen';
+import { PinStep } from './components/onboarding/PinStep';
 import { MedicalExportModal } from './components/MedicalExportModal';
 import { RECIPES, STORAGE_KEYS, TABS, TAB_STR_KEY, TEXT_SIZE_SCALE } from './data/constants';
 import { saveKey, loadKey, todayISO, uid } from './utils/dates';
@@ -49,10 +51,13 @@ export default function ControlDiabetesApp() {
   const [showLabStudies, setShowLabStudies] = useState(false);
   const [showLabStudyForm, setShowLabStudyForm] = useState(false);
   const [showSos, setShowSos] = useState(false);
+  const [pinHash, setPinHash] = useState(null);
+  const [biometricCredentialId, setBiometricCredentialId] = useState(null);
+  const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const [g, pr, m, ml, a, ls, f, p, lang, dev, ts] = await Promise.all([
+      const [g, pr, m, ml, a, ls, f, p, lang, dev, ts, pin, bio] = await Promise.all([
         loadKey(STORAGE_KEYS.glucose, []),
         loadKey(STORAGE_KEYS.pressure, []),
         loadKey(STORAGE_KEYS.medications, []),
@@ -64,6 +69,8 @@ export default function ControlDiabetesApp() {
         loadKey(STORAGE_KEYS.language, 'es'),
         loadKey(STORAGE_KEYS.device, null),
         loadKey(STORAGE_KEYS.textSize, 'normal'),
+        loadKey(STORAGE_KEYS.pin, null),
+        loadKey(STORAGE_KEYS.biometricCredentialId, null),
       ]);
       setGlucose(g);
       setPressure(pr);
@@ -76,6 +83,8 @@ export default function ControlDiabetesApp() {
       setLanguage(lang);
       setDevice(dev);
       setTextSize(ts);
+      setPinHash(pin);
+      setBiometricCredentialId(bio);
       setLoading(false);
     })();
   }, []);
@@ -209,7 +218,38 @@ export default function ControlDiabetesApp() {
   async function deleteProfile() {
     setProfile(null);
     await saveKey(STORAGE_KEYS.profile, null);
+    setPinHash(null);
+    await saveKey(STORAGE_KEYS.pin, null);
+    setBiometricCredentialId(null);
+    await saveKey(STORAGE_KEYS.biometricCredentialId, null);
+    setUnlocked(false);
     showToast('Perfil eliminado');
+  }
+
+  async function handleOnboardingComplete(p, newPinHash, newBiometricCredentialId) {
+    setProfile(p);
+    await saveKey(STORAGE_KEYS.profile, p);
+    if (p.idioma) {
+      setLanguage(p.idioma);
+      await saveKey(STORAGE_KEYS.language, p.idioma);
+    }
+    setPinHash(newPinHash);
+    await saveKey(STORAGE_KEYS.pin, newPinHash);
+    setBiometricCredentialId(newBiometricCredentialId || null);
+    await saveKey(STORAGE_KEYS.biometricCredentialId, newBiometricCredentialId || null);
+    setUnlocked(true);
+  }
+
+  async function handlePinSetupDone(newPinHash, newBiometricCredentialId) {
+    setPinHash(newPinHash);
+    await saveKey(STORAGE_KEYS.pin, newPinHash);
+    setBiometricCredentialId(newBiometricCredentialId || null);
+    await saveKey(STORAGE_KEYS.biometricCredentialId, newBiometricCredentialId || null);
+    setUnlocked(true);
+  }
+
+  function lockApp() {
+    setUnlocked(false);
   }
 
   async function saveDevice(d) {
@@ -227,7 +267,21 @@ export default function ControlDiabetesApp() {
   }
 
   if (!profile) {
-    return <OnboardingScreen onComplete={saveProfile} onLanguageChange={changeLanguage} />;
+    return <OnboardingScreen onComplete={handleOnboardingComplete} onLanguageChange={changeLanguage} />;
+  }
+
+  if (!pinHash) {
+    return (
+      <PinStep
+        title="Protege tu información"
+        subtitle="Crea un PIN de 4 dígitos para acceder a Glucosia. Es obligatorio para llevar tu registro de medicamentos."
+        onDone={handlePinSetupDone}
+      />
+    );
+  }
+
+  if (!unlocked) {
+    return <LockScreen pinHash={pinHash} biometricCredentialId={biometricCredentialId} onUnlock={() => setUnlocked(true)} />;
   }
 
   const firstName = (profile.nombre || '').split(' ')[0];
@@ -304,6 +358,7 @@ export default function ControlDiabetesApp() {
             onDeleteProfile={deleteProfile}
             onExportHistory={() => setShowMedicalExport(true)}
             onOpenLabStudies={() => setShowLabStudies(true)}
+            onLock={lockApp}
           />
         )}
       </div>
