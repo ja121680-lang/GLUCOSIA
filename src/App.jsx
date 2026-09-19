@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { HelpCircle, Loader2, Settings } from 'lucide-react';
 import { Toast } from './components/shared/Toast';
+import { SosModal } from './components/shared/SosModal';
 import { OnboardingScreen } from './components/onboarding/OnboardingScreen';
 import { MedicalExportModal } from './components/MedicalExportModal';
 import { RECIPES, STORAGE_KEYS, TABS, TAB_STR_KEY, TEXT_SIZE_SCALE } from './data/constants';
@@ -47,6 +48,7 @@ export default function ControlDiabetesApp() {
   const [showMedicalExport, setShowMedicalExport] = useState(false);
   const [showLabStudies, setShowLabStudies] = useState(false);
   const [showLabStudyForm, setShowLabStudyForm] = useState(false);
+  const [showSos, setShowSos] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -266,7 +268,7 @@ export default function ControlDiabetesApp() {
       </header>
 
       <div className="px-5 py-5">
-        {activeTab === 'inicio' && <InicioView glucose={glucose} medications={medications} medLog={medLog} appointments={appointments} onToggleDose={toggleDoseTaken} onGoTab={setActiveTab} />}
+        {activeTab === 'inicio' && <InicioView glucose={glucose} medications={medications} medLog={medLog} appointments={appointments} onToggleDose={toggleDoseTaken} onGoTab={setActiveTab} onOpenSos={() => setShowSos(true)} />}
         {activeTab === 'glucosa' && <GlucosaView glucose={glucose} onAdd={() => setShowGlucoseForm(true)} onDelete={deleteGlucoseReading} />}
         {activeTab === 'presion' && <PresionView pressure={pressure} onAdd={() => setShowPressureForm(true)} onDelete={deletePressureReading} />}
         {activeTab === 'medicamentos' && (
@@ -333,6 +335,7 @@ export default function ControlDiabetesApp() {
       {showMedicalExport && <MedicalExportModal profile={profile} glucose={glucose} pressure={pressure} medications={medications} appointments={appointments} labStudies={labStudies} onClose={() => setShowMedicalExport(false)} />}
       {showLabStudies && <LabStudiesModal labStudies={labStudies} onAdd={() => setShowLabStudyForm(true)} onDelete={deleteLabStudy} onClose={() => setShowLabStudies(false)} />}
       {showLabStudyForm && <LabStudyForm onSave={addLabStudy} onClose={() => setShowLabStudyForm(false)} />}
+      {showSos && <SosModal profile={profile} onClose={() => setShowSos(false)} onGoEditProfile={() => setShowProfileForm(true)} />}
 
       <Toast message={toast} />
     </div>

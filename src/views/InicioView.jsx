@@ -1,10 +1,10 @@
-import { Calendar, Check, ChevronRight } from 'lucide-react';
+import { Calendar, Check, ChevronRight, AlertTriangle } from 'lucide-react';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { GLUCOSE_CONTEXTS } from '../data/constants';
 import { formatDateLong, formatDateShort, todayISO } from '../utils/dates';
 import { getGlucoseStatus } from '../utils/health';
 
-export function InicioView({ glucose, medications, medLog, appointments, onToggleDose, onGoTab }) {
+export function InicioView({ glucose, medications, medLog, appointments, onToggleDose, onGoTab, onOpenSos }) {
   const today = todayISO();
   const sortedGlucose = [...glucose].sort((a, b) => (b.fecha + b.hora).localeCompare(a.fecha + a.hora));
   const lastReading = sortedGlucose[0];
@@ -33,6 +33,14 @@ export function InicioView({ glucose, medications, medLog, appointments, onToggl
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-500 -mt-1">Herramienta de apoyo personal; no reemplaza el consejo de tu médico.</p>
+
+      <button
+        type="button"
+        onClick={onOpenSos}
+        className="w-full bg-red-600 text-white font-bold text-sm py-3.5 rounded-2xl flex items-center justify-center gap-2"
+      >
+        <AlertTriangle size={18} /> SOS — Necesito ayuda ahora
+      </button>
 
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
         <div className="flex items-center justify-between mb-1">

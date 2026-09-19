@@ -15,6 +15,8 @@ export function ProfileForm({ initial, onSave, onClose, onLanguageChange }) {
   const [esHipertenso, setEsHipertenso] = useState(initial?.esHipertenso ?? false);
   const [condiciones, setCondiciones] = useState(initial?.condiciones || []);
   const [condicionOtro, setCondicionOtro] = useState(initial?.condicionOtro || '');
+  const [contactoEmergenciaNombre, setContactoEmergenciaNombre] = useState(initial?.contactoEmergenciaNombre || '');
+  const [contactoEmergenciaTelefono, setContactoEmergenciaTelefono] = useState(initial?.contactoEmergenciaTelefono || '');
   const [error, setError] = useState('');
 
   function handleSetIdioma(id) {
@@ -24,7 +26,12 @@ export function ProfileForm({ initial, onSave, onClose, onLanguageChange }) {
 
   function handleSave() {
     if (!nombre.trim()) { setError('Escribe tu nombre para continuar.'); return; }
-    onSave({ nombre: nombre.trim(), edad, telefono, correo, tipoDiabetes, idioma, esHipertenso, condiciones, condicionOtro: condiciones.includes('otro') ? condicionOtro.trim() : '' });
+    onSave({
+      nombre: nombre.trim(), edad, telefono, correo, tipoDiabetes, idioma, esHipertenso, condiciones,
+      condicionOtro: condiciones.includes('otro') ? condicionOtro.trim() : '',
+      contactoEmergenciaNombre: contactoEmergenciaNombre.trim(),
+      contactoEmergenciaTelefono: contactoEmergenciaTelefono.trim(),
+    });
   }
 
   return (
@@ -40,6 +47,24 @@ export function ProfileForm({ initial, onSave, onClose, onLanguageChange }) {
         condiciones={condiciones} setCondiciones={setCondiciones}
         condicionOtro={condicionOtro} setCondicionOtro={setCondicionOtro}
       />
+      <div className="mt-4 pt-4 border-t border-slate-100">
+        <p className="text-xs font-medium text-slate-500 mb-1">🆘 Contacto de emergencia</p>
+        <p className="text-xs text-slate-400 mb-2.5">Esta persona recibirá un SMS con tu ubicación si usas el botón SOS.</p>
+        <input
+          type="text"
+          value={contactoEmergenciaNombre}
+          onChange={(e) => setContactoEmergenciaNombre(e.target.value)}
+          placeholder="Nombre del contacto"
+          className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm mb-2"
+        />
+        <input
+          type="tel"
+          value={contactoEmergenciaTelefono}
+          onChange={(e) => setContactoEmergenciaTelefono(e.target.value)}
+          placeholder="Teléfono (10 dígitos)"
+          className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm"
+        />
+      </div>
       {error && <p className="text-xs text-red-500 mt-3">{error}</p>}
       <div className="flex gap-2 mt-5">
         <button type="button" onClick={onClose} className="flex-1 bg-slate-50 text-slate-700 font-medium text-sm py-3 rounded-xl">{t('cancel', idioma)}</button>
@@ -171,15 +196,36 @@ export function DevicePairingView({ initial, onSave, onClose }) {
   const [selectedBrand, setSelectedBrand] = useState(
     initial ? SENSOR_BRANDS.find((b) => b.id === initial.id) || null : null
   );
+  const [pairedName, setPairedName] = useState(initial?.pairedName || '');
+  const [error, setError] = useState('');
 
-  function handleSelect(brand) {
+  async function handleSelect(brand) {
+    setError('');
+    if (!navigator.bluetooth) {
+      setError('Este navegador no soporta Bluetooth. Prueba en Chrome/Edge en Android, o registra tus lecturas a mano.');
+      return;
+    }
     setSelectedBrand(brand);
     setStep('connecting');
-    setTimeout(() => {
-      const device = { id: brand.id, label: brand.label, maker: brand.maker };
-      onSave(device);
+    try {
+      // Conexión real por Web Bluetooth: se pide al sistema el selector de
+      // dispositivos cercanos. FreeStyle Libre/Dexcom/Guardian usan
+      // protocolos cerrados y encriptados del fabricante — no es posible
+      // leer sus valores de glucosa por esta vía genérica, solo emparejar
+      // el dispositivo. Ver la nota dentro de la pantalla "connected".
+      const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
+      setPairedName(device.name || brand.label);
+      onSave({ id: brand.id, label: brand.label, maker: brand.maker, pairedName: device.name || brand.label });
       setStep('connected');
-    }, 1800);
+    } catch (err) {
+      if (err && err.name === 'NotFoundError') {
+        // el usuario cerró el selector sin elegir nada — no es un error real
+        setStep('select');
+        return;
+      }
+      setError('No se pudo vincular el dispositivo: ' + (err?.message || 'error desconocido'));
+      setStep('select');
+    }
   }
 
   function handleUnlink() {
@@ -193,6 +239,7 @@ export function DevicePairingView({ initial, onSave, onClose }) {
       {step === 'select' && (
         <div>
           <p className="text-sm text-slate-400 mb-1">Elige la marca o tipo de sensor que usas.</p>
+          {error && <p className="text-xs text-red-500 mt-1 mb-2">{error}</p>}
           <div className="space-y-2 mt-3">
             {SENSOR_BRANDS.map((b) => (
               <button key={b.id} type="button" onClick={() => handleSelect(b)} className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200">
@@ -209,8 +256,8 @@ export function DevicePairingView({ initial, onSave, onClose }) {
       {step === 'connecting' && (
         <div className="text-center py-8">
           <Loader2 size={32} className="animate-spin text-yellow-500 mx-auto mb-3" />
-          <p className="text-sm font-medium text-slate-900">Buscando {selectedBrand?.label}...</p>
-          <p className="text-xs text-slate-400 mt-1">Mantén el Bluetooth activado y el sensor cerca.</p>
+          <p className="text-sm font-medium text-slate-900">Buscando dispositivos cercanos...</p>
+          <p className="text-xs text-slate-400 mt-1">Elige tu {selectedBrand?.label} en la ventana que abrió el sistema.</p>
         </div>
       )}
       {step === 'connected' && (
@@ -219,8 +266,8 @@ export function DevicePairingView({ initial, onSave, onClose }) {
             <Check size={26} className="text-teal-600" />
           </div>
           <p className="font-semibold text-slate-900">Dispositivo vinculado</p>
-          <p className="text-sm text-slate-400 mt-1">{selectedBrand?.label}{selectedBrand?.maker ? ` · ${selectedBrand.maker}` : ''}</p>
-          <p className="text-xs text-slate-400 mt-4 bg-slate-50 rounded-xl p-3 text-left">Por ahora esta vinculación es una simulación. La lectura automática de tu sensor llegará en una futura actualización.</p>
+          <p className="text-sm text-slate-400 mt-1">{pairedName || selectedBrand?.label}{selectedBrand?.maker ? ` · ${selectedBrand.maker}` : ''}</p>
+          <p className="text-xs text-slate-400 mt-4 bg-slate-50 rounded-xl p-3 text-left">La conexión Bluetooth con tu dispositivo es real. La lectura automática de valores de glucosa no está disponible todavía: FreeStyle Libre, Dexcom y equipos similares usan un protocolo cerrado del fabricante que no se puede leer por esta vía — por ahora, registra tu valor a mano en la pestaña Glucosa.</p>
           <button type="button" onClick={handleUnlink} className="w-full bg-red-50 text-red-500 font-medium text-sm py-2.5 rounded-xl mt-4">Desvincular dispositivo</button>
         </div>
       )}
