@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { Camera, ChevronRight, FolderOpen, Loader2, MapPin, Pencil, Plus, Search, Stethoscope, Trash2, X } from 'lucide-react';
+import { Camera, ChevronRight, FolderOpen, Loader2, MapPin, Pencil, Plus, Search, Stethoscope, Trash2 } from 'lucide-react';
+import { DocThumb } from '../components/shared/DocThumb';
 import { EmptyState } from '../components/shared/EmptyState';
 import { FormLabel } from '../components/shared/FormLabel';
 import { Modal } from '../components/shared/Modal';
@@ -27,7 +28,7 @@ export function AppointmentCard({ a, onEdit, onDelete, past }) {
           {a.notas && <p className="text-sm text-slate-600">{a.notas}</p>}
           {a.documentos && a.documentos.length > 0 && (
             <div className="flex gap-2 overflow-x-auto">
-              {a.documentos.map((d) => <img key={d.id} src={d.imagen} alt={d.nombre} className="w-14 h-14 object-cover rounded-lg flex-shrink-0" />)}
+              {a.documentos.map((d) => <DocThumb key={d.id} doc={d} className="w-14 h-14" />)}
             </div>
           )}
           <div className="flex gap-2 pt-1">
@@ -155,22 +156,17 @@ export function AppointmentForm({ initial, onSave, onClose }) {
         </div>
         <div>
           <FormLabel>Documentos (opcional)</FormLabel>
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+          <input ref={fileInputRef} type="file" accept="image/*,application/pdf" onChange={handleFileChange} className="hidden" />
           {documentos.length > 0 && (
             <div className="flex gap-2 overflow-x-auto mb-2">
               {documentos.map((d) => (
-                <div key={d.id} className="relative flex-shrink-0">
-                  <img src={d.imagen} alt={d.nombre} className="w-16 h-16 object-cover rounded-lg" />
-                  <button type="button" onClick={() => removeDoc(d.id)} className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-900 flex items-center justify-center">
-                    <X size={10} className="text-white" />
-                  </button>
-                </div>
+                <DocThumb key={d.id} doc={d} onRemove={() => removeDoc(d.id)} />
               ))}
             </div>
           )}
           <button type="button" onClick={() => fileInputRef.current && fileInputRef.current.click()} disabled={processingImg} className="w-full flex items-center justify-center gap-2 border border-dashed border-slate-300 rounded-xl py-3 text-slate-400 text-sm">
             {processingImg ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
-            {processingImg ? 'Procesando...' : 'Agregar foto de receta o resultado'}
+            {processingImg ? 'Procesando...' : 'Agregar foto o PDF de receta o resultado'}
           </button>
         </div>
         {error && <p className="text-xs text-red-500">{error}</p>}
@@ -236,7 +232,7 @@ export function MedicalArchiveModal({ appointments, onClose }) {
                       <p className="text-xs text-slate-500 mt-0.5">{formatDateLong(a.fecha)}{a.lugar ? ` · ${a.lugar}` : ''}</p>
                       <div className="flex gap-2 mt-2.5 overflow-x-auto">
                         {a.documentos.map((d) => (
-                          <img key={d.id} src={d.imagen} alt={d.nombre} className="w-16 h-16 object-cover rounded-lg flex-shrink-0" />
+                          <DocThumb key={d.id} doc={d} />
                         ))}
                       </div>
                     </div>
