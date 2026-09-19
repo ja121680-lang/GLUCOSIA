@@ -1,9 +1,48 @@
-import { useState } from 'react';
-import { AlertTriangle, Bluetooth, Check, ChevronRight, FileText, Globe, HelpCircle, Loader2, Lock, Mail, Pencil, Phone, TestTube, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertTriangle, AlarmClock, Bluetooth, Check, ChevronRight, FileText, Globe, HelpCircle, Loader2, Lock, Mail, Pencil, Phone, TestTube, Trash2 } from 'lucide-react';
 import { Modal } from '../components/shared/Modal';
 import { ProfileFields } from '../components/onboarding/ProfileFields';
 import { APP_LANGUAGES, DIABETES_TYPES, MEDICAL_CONDITIONS, SENSOR_BRANDS } from '../data/constants';
+import { requestReminderPermission } from '../hooks/useReminderLoop';
 import { t } from '../utils/i18n';
+
+function ReminderPermissionTile() {
+  const [permission, setPermission] = useState(
+    typeof window !== 'undefined' && window.Notification ? Notification.permission : 'unsupported',
+  );
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.Notification) {
+      setPermission(Notification.permission);
+    }
+  }, []);
+
+  async function handleTap() {
+    if (permission === 'granted') return;
+    const result = await requestReminderPermission();
+    setPermission(result);
+  }
+
+  const subtitle =
+    permission === 'granted'
+      ? 'Activados: avisan con sonido y notificación cuando abras la app'
+      : permission === 'unsupported'
+        ? 'Tu navegador no soporta avisos del sistema; el aviso en pantalla sigue funcionando'
+        : 'Tócalo para activar el sonido y la notificación al llegar la hora';
+
+  return (
+    <button type="button" onClick={handleTap} className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex items-center gap-3">
+      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0">
+        <AlarmClock size={17} className="text-slate-400" />
+      </div>
+      <div className="flex-1 text-left">
+        <p className="text-sm font-semibold text-slate-900">Recordatorios y alarmas</p>
+        <p className="text-xs text-slate-400">{subtitle}</p>
+      </div>
+      {permission === 'granted' ? <Check size={16} className="text-emerald-500" /> : <ChevronRight size={16} className="text-slate-300" />}
+    </button>
+  );
+}
 
 export function ProfileForm({ initial, onSave, onClose, onLanguageChange }) {
   const [nombre, setNombre] = useState(initial?.nombre || '');
@@ -172,6 +211,8 @@ export function PerfilView({ profile, device, language, onEditProfile, onChangeL
         </div>
         <ChevronRight size={16} className="text-slate-300" />
       </button>
+
+      <ReminderPermissionTile />
 
       <button type="button" onClick={onOpenLabStudies} className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0">

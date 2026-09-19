@@ -3,8 +3,10 @@ import { HelpCircle, Loader2, Settings } from 'lucide-react';
 import { Toast } from './components/shared/Toast';
 import { SosModal } from './components/shared/SosModal';
 import { LockScreen } from './components/LockScreen';
+import { ReminderBanner } from './components/shared/ReminderBanner';
 import { OnboardingScreen } from './components/onboarding/OnboardingScreen';
 import { PinStep } from './components/onboarding/PinStep';
+import { useReminderLoop } from './hooks/useReminderLoop';
 import { MedicalExportModal } from './components/MedicalExportModal';
 import { RECIPES, STORAGE_KEYS, TABS, TAB_STR_KEY, TEXT_SIZE_SCALE } from './data/constants';
 import { saveKey, loadKey, todayISO, uid } from './utils/dates';
@@ -94,6 +96,21 @@ export default function ControlDiabetesApp() {
       setActiveTab('inicio');
     }
   }, [activeTab, profile]);
+
+  const { activeReminder, dismissReminder } = useReminderLoop({
+    medications,
+    medLog,
+    appointments,
+    enabled: !loading && !!profile && !!pinHash && unlocked,
+  });
+
+  async function dismissActiveReminder() {
+    if (activeReminder?.type === 'medication') {
+      const med = medications.find((m) => m.id === activeReminder.medId);
+      if (med) await toggleDoseTaken(med, activeReminder.time);
+    }
+    dismissReminder();
+  }
 
   function showToast(msg) {
     setToast(msg);
@@ -391,6 +408,7 @@ export default function ControlDiabetesApp() {
       {showLabStudies && <LabStudiesModal labStudies={labStudies} onAdd={() => setShowLabStudyForm(true)} onDelete={deleteLabStudy} onClose={() => setShowLabStudies(false)} />}
       {showLabStudyForm && <LabStudyForm onSave={addLabStudy} onClose={() => setShowLabStudyForm(false)} />}
       {showSos && <SosModal profile={profile} onClose={() => setShowSos(false)} onGoEditProfile={() => setShowProfileForm(true)} />}
+      <ReminderBanner reminder={activeReminder} onDismiss={dismissActiveReminder} />
 
       <Toast message={toast} />
     </div>
