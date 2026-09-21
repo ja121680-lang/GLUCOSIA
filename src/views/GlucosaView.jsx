@@ -34,7 +34,7 @@ export function GlucosaView({ glucose, onAdd, onDelete }) {
                 const isOpen = expandedId === g.id;
                 return (
                   <div key={g.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <button onClick={() => setExpandedId(isOpen ? null : g.id)} className="w-full flex items-center gap-3 p-3.5">
+                    <button onClick={() => setExpandedId(isOpen ? null : g.id)} className="w-full flex items-center gap-3 p-3.5 transition-transform active:scale-[0.99]">
                       <div className={`w-2 h-10 rounded-full ${status.dot}`} />
                       <div className="flex-1 text-left">
                         <div className="flex items-baseline gap-1.5">
@@ -144,8 +144,8 @@ export function GlucoseForm({ onSave, onClose }) {
         </div>
         {error && <p className="text-xs text-red-500">{error}</p>}
         <div className="flex gap-2 mt-2">
-          <button type="button" onClick={onClose} className="flex-1 bg-slate-50 text-slate-700 font-medium text-sm py-3 rounded-xl">Cancelar</button>
-          <button type="button" onClick={handleSave} className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 font-semibold py-3 rounded-xl">Guardar lectura</button>
+          <button type="button" onClick={onClose} className="flex-1 bg-slate-50 text-slate-700 font-medium text-sm py-3 rounded-xl transition-transform active:scale-[0.98]">Cancelar</button>
+          <button type="button" onClick={handleSave} className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 font-semibold py-3 rounded-xl transition-transform active:scale-[0.98]">Guardar lectura</button>
         </div>
       </div>
     </Modal>

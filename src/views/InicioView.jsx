@@ -37,7 +37,7 @@ export function InicioView({ glucose, medications, medLog, appointments, onToggl
       <button
         type="button"
         onClick={onOpenSos}
-        className="w-full bg-red-600 text-white font-bold text-sm py-3.5 rounded-2xl flex items-center justify-center gap-2"
+        className="w-full bg-red-600 text-white font-bold text-sm py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
       >
         <AlertTriangle size={18} /> SOS — Necesito ayuda ahora
       </button>
@@ -81,7 +81,7 @@ export function InicioView({ glucose, medications, medLog, appointments, onToggl
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">Medicamentos de hoy</p>
           <div className="space-y-2">
             {todayDoses.map((d, i) => (
-              <button key={i} onClick={() => onToggleDose(d.med, d.time)} className="w-full flex items-center gap-3">
+              <button key={i} onClick={() => onToggleDose(d.med, d.time)} className="w-full flex items-center gap-3 transition-transform active:scale-[0.98]">
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${d.taken ? 'bg-teal-500 border-teal-500' : 'border-slate-200'}`}>
                   {d.taken && <Check size={13} className="text-white" />}
                 </div>
@@ -96,7 +96,7 @@ export function InicioView({ glucose, medications, medLog, appointments, onToggl
       )}
 
       {nextAppt && (
-        <button onClick={() => onGoTab('citas')} className="w-full bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-3">
+        <button onClick={() => onGoTab('citas')} className="w-full bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-3 transition-transform active:scale-[0.98]">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-slate-900 flex items-center justify-center flex-shrink-0">
             <Calendar size={17} className="text-white" />
           </div>

@@ -51,7 +51,7 @@ export function LockScreen({ pinHash, biometricCredentialId, onUnlock }) {
         <div className="grid grid-cols-3 gap-3 mt-6 w-full max-w-[260px]">
           {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'].map((k, idx) => (
             k === '' ? <div key={idx} /> : (
-              <button key={idx} type="button" onClick={() => handleKey(k)} className="h-14 rounded-2xl bg-white shadow text-lg font-semibold text-slate-900 flex items-center justify-center">
+              <button key={idx} type="button" onClick={() => handleKey(k)} className="h-14 rounded-2xl bg-white shadow text-lg font-semibold text-slate-900 flex items-center justify-center transition-transform active:scale-90 active:bg-slate-50">
                 {k === 'del' ? '⌫' : k}
               </button>
             )

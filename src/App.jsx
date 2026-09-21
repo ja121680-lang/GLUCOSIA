@@ -313,7 +313,7 @@ export default function ControlDiabetesApp() {
           </div>
           <div className="flex items-center gap-2">
             <div className="relative">
-              <button type="button" onClick={() => setShowTextSizeMenu(!showTextSizeMenu)} className="w-9 h-9 rounded-full bg-white bg-opacity-10 flex items-center justify-center">
+              <button type="button" onClick={() => setShowTextSizeMenu(!showTextSizeMenu)} className="w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center transition-transform active:scale-90">
                 <Settings size={16} className="text-white" />
               </button>
               {showTextSizeMenu && (
@@ -331,7 +331,7 @@ export default function ControlDiabetesApp() {
                 </div>
               )}
             </div>
-            <button type="button" onClick={() => setShowHelp(true)} className="w-9 h-9 rounded-full bg-white bg-opacity-10 flex items-center justify-center">
+            <button type="button" onClick={() => setShowHelp(true)} className="w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center transition-transform active:scale-90">
               <HelpCircle size={16} className="text-white" />
             </button>
           </div>
@@ -385,7 +385,7 @@ export default function ControlDiabetesApp() {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
           return (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-1 flex flex-col items-center gap-1 py-2.5 ${active ? 'text-yellow-400' : 'text-slate-400'}`}>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-1 flex flex-col items-center gap-1 py-2.5 transition-transform active:scale-95 ${active ? 'text-yellow-400' : 'text-slate-400'}`}>
               <Icon size={22} strokeWidth={active ? 2.5 : 2} />
               <span className="text-xs font-medium">{t(TAB_STR_KEY[tab.id], language)}</span>
             </button>
