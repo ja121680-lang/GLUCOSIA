@@ -28,6 +28,14 @@ function ensureHero(){
   if(!hero){hero=document.createElement('div');hero.id='ga-glucosia-hero';hero.className='ga-glucosia-hero';hero.innerHTML='<img src="/assets/ga-glucosia-hero.svg" alt="GA Glucosia: seguimiento visual de glucosa y tendencia">';root.insertBefore(hero,root.firstChild);}
   hero.style.display=isHome?'block':'none';
 }
+function ensureOnboardingHero(){
+  if(document.querySelector('nav'))return;
+  const h1=[...document.querySelectorAll('#root h1')].find(h=>norm(h.textContent).includes('glucosia'));
+  if(!h1||document.getElementById('ga-onboarding-hero'))return;
+  const host=h1.parentElement;if(!host)return;
+  const old=host.querySelector(':scope > div[class*="w-20"],:scope > div[class*="w-16"]');if(old)old.style.display='none';
+  const hero=document.createElement('div');hero.id='ga-onboarding-hero';hero.className='ga-glucosia-hero ga-onboarding-hero';hero.innerHTML='<img src="/assets/ga-glucosia-hero.svg" alt="GA Glucosia: seguimiento accesible de glucosa">';host.insertBefore(hero,h1);
+}
 function enhanceRecipes(){
   const root=contentRoot();if(!root)return;const isRecipes=(LABELS.recetas||[]).map(norm).some(x=>activeNavText().includes(x));if(!isRecipes)return;
   const cards=[...root.querySelectorAll('button')].filter(b=>/kcal/i.test(b.textContent||'')&&(/carb/i.test(b.textContent||'')||/min/i.test(b.textContent||'')));
@@ -36,8 +44,9 @@ function enhanceRecipes(){
 function addAria(){
   [...document.querySelectorAll('header button')].forEach((b,i)=>{if(!b.getAttribute('aria-label'))b.setAttribute('aria-label',i===0?'Ajustes de visualización':'Ayuda');});
   [...document.querySelectorAll('nav button')].forEach(b=>{if(!b.getAttribute('aria-label'))b.setAttribute('aria-label','Ir a '+(b.textContent||'sección').trim());});
+  [...document.querySelectorAll('.fixed.inset-0')].forEach(modal=>{if(!modal.getAttribute('role'))modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');});
 }
-function refreshVisuals(){ensureHero();enhanceRecipes();addAria();}
+function refreshVisuals(){ensureOnboardingHero();ensureHero();enhanceRecipes();addAria();}
 
 function assistantMarkup(){
   if(document.getElementById('ga-glucosia-assistant-fab'))return;
@@ -58,26 +67,23 @@ function assistantMarkup(){
 function speak(text){try{if(!('speechSynthesis'in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='es-MX';u.rate=.96;window.speechSynthesis.speak(u);}catch(e){}}
 function answer(text,voice=true){const r=document.getElementById('ga-assistant-response');if(r)r.textContent=text;if(voice)speak(text);}
 function firstName(){const p=document.querySelector('header p');if(!p)return'';const m=(p.textContent||'').match(/(?:Hola|Hello|Olá|Bonjour|Ciao|Hallo)[, ]+([^,]+)/i);return m?m[1].trim():'';}
-function visibleGlucose(){
-  const root=contentRoot();if(!root)return null;const txt=root.innerText||'';const m=txt.match(/(\d{2,3})\s*mg\/dL/i);return m?m[1]:null;
-}
-function doNavigate(target,msg){if(navTo(target)){answer(msg);return true;}answer('No pude abrir esa sección en este momento. Puedes usar la barra inferior o pedirme otra sección.');return false;}
+function visibleGlucose(){const root=contentRoot();if(!root)return null;const txt=root.innerText||'';const m=txt.match(/(\d{2,3})\s*mg\/dL/i);return m?m[1]:null;}
+function doNavigate(target,msg){if(navTo(target)){answer(msg);return true;}if(!document.querySelector('nav')){answer('Primero completa tu perfil. Después podré llevarte por toda Glucosia con voz o texto.');return false;}answer('No pude abrir esa sección en este momento. Puedes usar la barra inferior o pedirme otra sección.');return false;}
 function handleAssistant(raw){
   const t=norm(raw);if(!t)return;const name=firstName();
   if(/^(hola|buenos dias|buenas tardes|buenas noches|hello|ola)\b/.test(t)){answer('Hola'+(name?', '+name:'')+'. ¿En qué te puedo ayudar? Puedes hablarme con tus propias palabras.');return;}
-  if(/(ver|revisar|mostrar|consultar).*(glucosa|azucar)|mi glucosa|glucose/.test(t)){doNavigate('glucosa','Claro'+(name?', '+name:'')+'. Te llevo a tus mediciones de glucosa.');return;}
-  if(/(ver|revisar|mostrar|consultar).*(presion|tension)|mi presion|blood pressure/.test(t)){doNavigate('presion','Te llevo a presión arterial. Si esta sección no aparece, revisa que hipertensión esté activada en tu perfil.');return;}
+  if(!document.querySelector('nav')&&/(registr|perfil|empezar|comenzar|como inicio)/.test(t)){answer('Estás en el registro de Glucosia. Completa idioma y país por separado, tus datos básicos, tipo de diabetes y condiciones que correspondan. Puedes seleccionar varias condiciones.');return;}
+  if(/(ver|revisar|mostrar|consultar|registrar|agregar).*(glucosa|azucar)|mi glucosa|glucose/.test(t)){doNavigate('glucosa','Claro'+(name?', '+name:'')+'. Te llevo a tus mediciones de glucosa.');return;}
+  if(/(ver|revisar|mostrar|consultar|registrar).*(presion|tension)|mi presion|blood pressure/.test(t)){doNavigate('presion','Te llevo a presión arterial. Si esta sección no aparece, revisa que hipertensión esté activada en tu perfil.');return;}
   if(/medicamento|medicina|pastilla|dosis|meds/.test(t)){doNavigate('medicamentos','Abriendo tus medicamentos. Antes de cambiar o eliminar algo, revísalo en pantalla.');return;}
   if(/cita|doctor|medico|consulta|appointment/.test(t)){doNavigate('citas','Abriendo tus citas médicas.');return;}
   if(/receta|comida|aliment|recipe/.test(t)){doNavigate('recetas','Abriendo el recetario. Las recetas son contenido de apoyo y no sustituyen tu plan profesional.');return;}
-  if(/perfil|idioma|sensor|bluetooth|dispositivo|cuenta/.test(t)){doNavigate('perfil','Te llevo a tu perfil y configuración.');return;}
+  if(/perfil|idioma|pais|region|sensor|bluetooth|dispositivo|cuenta/.test(t)){doNavigate('perfil','Te llevo a tu perfil y configuración.');return;}
   if(/inicio|home|principal/.test(t)){doNavigate('inicio','Volviendo a Inicio.');return;}
-  if(/ultima glucosa|cuanto tengo|que valor tengo/.test(t)){
-    navTo('inicio');setTimeout(()=>{const v=visibleGlucose();answer(v?'Tu última glucosa visible en la app es '+v+' miligramos por decilitro. Revisa la fecha y el contexto en Glucosa.':'No encuentro una lectura visible todavía. Te llevo a Glucosa para revisarla o registrar una.');if(!v)navTo('glucosa');},160);return;
-  }
+  if(/ultima glucosa|cuanto tengo|que valor tengo/.test(t)){navTo('inicio');setTimeout(()=>{const v=visibleGlucose();answer(v?'Tu última glucosa visible en la app es '+v+' miligramos por decilitro. Revisa la fecha y el contexto en Glucosa.':'No encuentro una lectura visible todavía. Te llevo a Glucosa para revisarla o registrar una.');if(!v)navTo('glucosa');},160);return;}
   if(/reporte|historial medico|exportar|pdf/.test(t)){doNavigate('perfil','Te llevo a Perfil. Desde ahí puedes abrir Exportar historial médico y revisar el documento antes de descargarlo o compartirlo.');return;}
   if(/borrar|eliminar|delete|compartir|enviar/.test(t)){answer('Esa es una acción sensible. Puedo llevarte a la sección correcta, pero necesito que tú revises y confirmes la acción en pantalla.');return;}
-  if(/ayuda|no encuentro|no veo|que puedo hacer|como funciona/.test(t)){answer('Puedo ayudarte a navegar por Inicio, Glucosa, Presión, Medicamentos, Citas, Recetas y Perfil. También puedo indicarte dónde está tu historial. Dime qué quieres hacer.');return;}
+  if(/ayuda|no encuentro|no veo|que puedo hacer|como funciona/.test(t)){answer(document.querySelector('nav')?'Puedo ayudarte a navegar por Inicio, Glucosa, Presión, Medicamentos, Citas, Recetas y Perfil. También puedo indicarte dónde está tu historial. Dime qué quieres hacer.':'Puedo explicarte el registro por voz. Primero elige idioma y país por separado, completa tus datos y selecciona las condiciones que correspondan.');return;}
   answer('Entendí que necesitas ayuda, pero no quiero adivinar una acción de salud. Puedes decir, por ejemplo: “quiero ver mi glucosa”, “abre mis citas”, “busco mis medicamentos” o “dónde está mi historial”.');
 }
 function setupVoice(btn){
