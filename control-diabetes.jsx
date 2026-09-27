@@ -54,6 +54,25 @@ const APP_LANGUAGES = [
   { id: 'zh', label: '中文', flag: '🇨🇳' },
 ];
 
+
+const APP_REGIONS = [
+  { id: 'MX', label: 'México' },
+  { id: 'US', label: 'Estados Unidos' },
+  { id: 'CA', label: 'Canadá' },
+  { id: 'ES', label: 'España' },
+  { id: 'BR', label: 'Brasil' },
+  { id: 'AR', label: 'Argentina' },
+  { id: 'CO', label: 'Colombia' },
+  { id: 'CL', label: 'Chile' },
+  { id: 'PE', label: 'Perú' },
+  { id: 'EC', label: 'Ecuador' },
+  { id: 'FR', label: 'Francia' },
+  { id: 'DE', label: 'Alemania' },
+  { id: 'IT', label: 'Italia' },
+  { id: 'PT', label: 'Portugal' },
+  { id: 'OTHER', label: 'Otro país / región' },
+];
+
 const UI_STRINGS = {
   es: {
     home: 'Inicio', glucose: 'Glucosa', pressure: 'Presión', meds: 'Medicinas', appts: 'Citas', recipes: 'Recetas',
@@ -434,8 +453,8 @@ function WelcomeStep({ onStart }) {
         <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-600 to-slate-900 flex items-center justify-center mb-5 shadow-lg shadow-slate-300">
           <Droplet size={36} className="text-white" fill="white" />
         </div>
-        <h1 className="text-3xl font-bold text-slate-900">Glucosia</h1>
-        <p className="text-sm text-slate-500 mt-2 max-w-[260px]">Tu compañero diario para llevar el control de tu diabetes, sin complicaciones.</p>
+        <h1 className="text-3xl font-bold text-slate-900">GA Glucosia</h1>
+        <p className="text-sm text-slate-500 mt-2 max-w-[260px]">Seguimiento claro de glucosa, medicamentos y citas, con accesibilidad y control de tus datos.</p>
       </div>
       <div className="pb-6">
         <button type="button" onClick={onStart} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 font-semibold py-3.5 rounded-xl">Regístrate para acceder</button>
@@ -462,7 +481,7 @@ function CookiesStep({ onAccept }) {
   );
 }
 
-function ProfileFields({ nombre, setNombre, edad, setEdad, telefono, setTelefono, correo, setCorreo, tipoDiabetes, setTipoDiabetes, idioma, setIdioma, esHipertenso, setEsHipertenso, condiciones, setCondiciones, condicionOtro, setCondicionOtro }) {
+function ProfileFields({ nombre, setNombre, edad, setEdad, telefono, setTelefono, correo, setCorreo, tipoDiabetes, setTipoDiabetes, idioma, setIdioma, region, setRegion, esHipertenso, setEsHipertenso, condiciones, setCondiciones, condicionOtro, setCondicionOtro }) {
   function toggleCondicion(id) {
     setCondiciones((prev) => prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]);
   }
@@ -477,6 +496,13 @@ function ProfileFields({ nombre, setNombre, edad, setEdad, telefono, setTelefono
             </button>
           ))}
         </div>
+      </div>
+      <div>
+        <FormLabel>País / región</FormLabel>
+        <p className="text-xs text-slate-500 -mt-1 mb-2">Se guarda por separado del idioma para adaptar formatos y funciones regionales.</p>
+        <select value={region} onChange={(e) => setRegion(e.target.value)} className={inputClass}>
+          {APP_REGIONS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+        </select>
       </div>
       <div>
         <FormLabel>{t('fullName', idioma)}</FormLabel>
@@ -540,6 +566,7 @@ function OnboardingScreen({ onComplete, onLanguageChange }) {
   const [correo, setCorreo] = useState('');
   const [tipoDiabetes, setTipoDiabetes] = useState(DIABETES_TYPES[0].id);
   const [idioma, setIdioma] = useState('es');
+  const [region, setRegion] = useState('MX');
   const [esHipertenso, setEsHipertenso] = useState(false);
   const [condiciones, setCondiciones] = useState([]);
   const [condicionOtro, setCondicionOtro] = useState('');
@@ -552,7 +579,7 @@ function OnboardingScreen({ onComplete, onLanguageChange }) {
 
   function handleFinish() {
     if (!nombre.trim()) { setError('Escribe tu nombre para continuar.'); return; }
-    onComplete({ nombre: nombre.trim(), edad, telefono, correo, tipoDiabetes, idioma, esHipertenso, condiciones, condicionOtro: condiciones.includes('otro') ? condicionOtro.trim() : '' });
+    onComplete({ nombre: nombre.trim(), edad, telefono, correo, tipoDiabetes, idioma, region, esHipertenso, condiciones, condicionOtro: condiciones.includes('otro') ? condicionOtro.trim() : '' });
   }
 
   if (step === 'welcome') return <WelcomeStep onStart={() => setStep('cookies')} />;
@@ -569,6 +596,7 @@ function OnboardingScreen({ onComplete, onLanguageChange }) {
         correo={correo} setCorreo={setCorreo}
         tipoDiabetes={tipoDiabetes} setTipoDiabetes={setTipoDiabetes}
         idioma={idioma} setIdioma={handleSetIdioma}
+        region={region} setRegion={setRegion}
         esHipertenso={esHipertenso} setEsHipertenso={setEsHipertenso}
         condiciones={condiciones} setCondiciones={setCondiciones}
         condicionOtro={condicionOtro} setCondicionOtro={setCondicionOtro}
@@ -1261,6 +1289,7 @@ function MedicalExportModal({ profile, glucose, pressure, medications, appointme
             <p className="text-sm text-slate-900 font-medium">{profile?.nombre || 'Sin nombre'}</p>
             <p className="text-xs text-slate-600">{profile?.edad ? `${profile.edad} años` : 'Edad no registrada'}{profile?.telefono ? ` · ${profile.telefono}` : ''}</p>
             {profile?.correo && <p className="text-xs text-slate-600">{profile.correo}</p>}
+            <p className="text-xs text-slate-600">País / región: {APP_REGIONS.find((r) => r.id === profile?.region)?.label || 'No registrado'}</p>
             <p className="text-xs text-slate-600 mt-1">Tipo de diabetes: {diabetesLabel}</p>
             <p className="text-xs text-slate-600">Hipertensión: {profile?.esHipertenso ? 'Sí' : 'No'}</p>
             {condicionesLabels.length > 0 && (
@@ -1595,6 +1624,7 @@ function ProfileForm({ initial, onSave, onClose, onLanguageChange }) {
   const [correo, setCorreo] = useState(initial?.correo || '');
   const [tipoDiabetes, setTipoDiabetes] = useState(initial?.tipoDiabetes || DIABETES_TYPES[0].id);
   const [idioma, setIdioma] = useState(initial?.idioma || 'es');
+  const [region, setRegion] = useState(initial?.region || 'MX');
   const [esHipertenso, setEsHipertenso] = useState(initial?.esHipertenso ?? false);
   const [condiciones, setCondiciones] = useState(initial?.condiciones || []);
   const [condicionOtro, setCondicionOtro] = useState(initial?.condicionOtro || '');
@@ -1607,7 +1637,7 @@ function ProfileForm({ initial, onSave, onClose, onLanguageChange }) {
 
   function handleSave() {
     if (!nombre.trim()) { setError('Escribe tu nombre para continuar.'); return; }
-    onSave({ nombre: nombre.trim(), edad, telefono, correo, tipoDiabetes, idioma, esHipertenso, condiciones, condicionOtro: condiciones.includes('otro') ? condicionOtro.trim() : '' });
+    onSave({ nombre: nombre.trim(), edad, telefono, correo, tipoDiabetes, idioma, region, esHipertenso, condiciones, condicionOtro: condiciones.includes('otro') ? condicionOtro.trim() : '' });
   }
 
   return (
@@ -1619,6 +1649,7 @@ function ProfileForm({ initial, onSave, onClose, onLanguageChange }) {
         correo={correo} setCorreo={setCorreo}
         tipoDiabetes={tipoDiabetes} setTipoDiabetes={setTipoDiabetes}
         idioma={idioma} setIdioma={handleSetIdioma}
+        region={region} setRegion={setRegion}
         esHipertenso={esHipertenso} setEsHipertenso={setEsHipertenso}
         condiciones={condiciones} setCondiciones={setCondiciones}
         condicionOtro={condicionOtro} setCondicionOtro={setCondicionOtro}
@@ -1676,6 +1707,10 @@ function PerfilView({ profile, device, language, onEditProfile, onChangeLanguage
           <div className="flex items-center gap-2.5 text-sm text-slate-600">
             <Mail size={15} className="text-slate-400 flex-shrink-0" />
             <span className="truncate">{profile?.correo || 'Sin correo registrado'}</span>
+          </div>
+          <div className="flex items-center gap-2.5 text-sm text-slate-600">
+            <MapPin size={15} className="text-slate-400 flex-shrink-0" />
+            <span>{APP_REGIONS.find((r) => r.id === profile?.region)?.label || 'Región no registrada'}</span>
           </div>
         </div>
         {condicionesLabels.length > 0 && (
@@ -1754,15 +1789,36 @@ function DevicePairingView({ initial, onSave, onClose }) {
   const [selectedBrand, setSelectedBrand] = useState(
     initial ? SENSOR_BRANDS.find((b) => b.id === initial.id) || null : null
   );
+  const [pairingError, setPairingError] = useState('');
 
-  function handleSelect(brand) {
+  async function handleSelect(brand) {
     setSelectedBrand(brand);
+    setPairingError('');
+    if (!navigator.bluetooth || !navigator.bluetooth.requestDevice) {
+      setPairingError('Este navegador no permite buscar dispositivos Bluetooth desde la web. Puedes seguir registrando lecturas manualmente.');
+      setStep('select');
+      return;
+    }
     setStep('connecting');
-    setTimeout(() => {
-      const device = { id: brand.id, label: brand.label, maker: brand.maker };
+    try {
+      const browserDevice = await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
+      const device = {
+        id: brand.id,
+        label: browserDevice.name || brand.label,
+        maker: brand.maker,
+        bluetoothId: browserDevice.id || '',
+        discoveredWithWebBluetooth: true,
+      };
       onSave(device);
       setStep('connected');
-    }, 1800);
+    } catch (err) {
+      setStep('select');
+      if (err && err.name === 'NotFoundError') {
+        setPairingError('No seleccionaste ningún dispositivo. Inténtalo de nuevo cuando estés listo.');
+      } else {
+        setPairingError('No se pudo completar la búsqueda Bluetooth. Revisa permisos, Bluetooth y compatibilidad del navegador.');
+      }
+    }
   }
 
   function handleUnlink() {
@@ -1775,7 +1831,8 @@ function DevicePairingView({ initial, onSave, onClose }) {
     <Modal title="Sensor de glucosa" onClose={onClose}>
       {step === 'select' && (
         <div>
-          <p className="text-sm text-slate-400 mb-1">Elige la marca o tipo de sensor que usas.</p>
+          <p className="text-sm text-slate-400 mb-1">Elige la marca o tipo de sensor que usas. El navegador abrirá su selector Bluetooth para que tú confirmes el dispositivo.</p>
+          {pairingError && <p className="text-sm text-red-500 bg-red-50 rounded-xl p-3 mt-3">{pairingError}</p>}
           <div className="space-y-2 mt-3">
             {SENSOR_BRANDS.map((b) => (
               <button key={b.id} type="button" onClick={() => handleSelect(b)} className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200">
@@ -1803,7 +1860,7 @@ function DevicePairingView({ initial, onSave, onClose }) {
           </div>
           <p className="font-semibold text-slate-900">Dispositivo vinculado</p>
           <p className="text-sm text-slate-400 mt-1">{selectedBrand?.label}{selectedBrand?.maker ? ` · ${selectedBrand.maker}` : ''}</p>
-          <p className="text-xs text-slate-400 mt-4 bg-slate-50 rounded-xl p-3 text-left">Por ahora esta vinculación es una simulación. La lectura automática de tu sensor llegará en una futura actualización.</p>
+          <p className="text-xs text-slate-400 mt-4 bg-slate-50 rounded-xl p-3 text-left">Dispositivo seleccionado mediante Bluetooth del navegador. Glucosia guarda la referencia localmente. La lectura automática de glucosa depende del protocolo compatible de cada modelo; si no está integrado, continúa registrando tus lecturas manualmente.</p>
           <button type="button" onClick={handleUnlink} className="w-full bg-red-50 text-red-500 font-medium text-sm py-2.5 rounded-xl mt-4">Desvincular dispositivo</button>
         </div>
       )}
