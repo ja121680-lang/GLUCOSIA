@@ -2,7 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="theme-color" content="#0B0B0B" />
     <title>Glucosia</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,7 +25,9 @@
         --ga-border: #343434;
       }
       html, body, #root { background: var(--ga-black) !important; color: var(--ga-white); min-height: 100%; }
-      body { margin: 0; }
+      body { margin: 0; font-size: 16px; }
+      button, a, select { min-height: 44px; }
+      @media (min-width: 768px) { body { font-size: 17px; } }
 
       /* Replace legacy slate/indigo/amber brand surfaces with GA surfaces. */
       .bg-white, .bg-slate-50 { background-color: var(--ga-surface) !important; }
