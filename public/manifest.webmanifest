@@ -1,0 +1,19 @@
+{
+  "name": "Glucosia — GA",
+  "short_name": "Glucosia",
+  "description": "Registro personal de glucosa, presión, medicamentos, citas y estudios.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B0B0B",
+  "theme_color": "#0B0B0B",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
