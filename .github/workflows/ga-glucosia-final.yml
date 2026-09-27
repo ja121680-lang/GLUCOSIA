@@ -6,6 +6,9 @@ on:
       - ga/glucosia-final-ga-20260927
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-and-validate:
     runs-on: ubuntu-latest
@@ -13,6 +16,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ga/glucosia-final-ga-20260927
+          fetch-depth: 0
+      - name: Apply GA final source patch
+        run: python3 scripts/ga_glucosia_final_patch.py
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -21,7 +29,7 @@ jobs:
         run: npm install
       - name: Validate GA assistant syntax
         run: node --check ga-glucosia.js
-      - name: Validate required premium assets
+      - name: Validate required premium assets and source changes
         run: |
           test -f ga-glucosia.css
           test -f ga-glucosia.js
@@ -33,9 +41,23 @@ jobs:
           grep -q 'ga-glucosia.css' index.html
           grep -q 'ga-glucosia.js' index.html
           grep -q 'GA Glucosia' index.html
+          grep -q 'APP_REGIONS' control-diabetes.jsx
+          grep -q 'navigator.bluetooth.requestDevice' control-diabetes.jsx
+          grep -q 'discoveredWithWebBluetooth' control-diabetes.jsx
       - name: Build Vite production bundle
         run: npm run build
       - name: Validate dist
         run: |
           test -f dist/index.html
           grep -q 'GA Glucosia' dist/index.html
+      - name: Commit generated source changes if needed
+        run: |
+          if [ -z "$(git status --porcelain -- control-diabetes.jsx)" ]; then
+            echo "No generated source changes to commit."
+            exit 0
+          fi
+          git config user.name "GA Glucosia QA Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add control-diabetes.jsx
+          git commit -m "build: persist GA region and Bluetooth hardening"
+          git push origin HEAD:ga/glucosia-final-ga-20260927
