@@ -1,9 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import ControlDiabetesApp from './App.jsx'
+import { GAAssistant } from './components/GAAssistant.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ControlDiabetesApp />
+    <GAAssistant />
   </React.StrictMode>
 )
