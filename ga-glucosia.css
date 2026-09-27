@@ -28,8 +28,11 @@ html.ga-premium nav button span{font-size:13px!important;font-weight:800!importa
 html.ga-premium .rounded-2xl{border-color:var(--ga-line)!important;}
 html.ga-premium [role="dialog"]{color:var(--ga-white);}
 html.ga-premium .fixed.inset-0 [class*="bg-white"]{background:var(--ga-surface)!important;}
-.ga-glucosia-hero{overflow:hidden;border:1px solid rgba(212,175,55,.72);border-radius:22px;margin:0 0 20px;background:#080808;box-shadow:0 20px 48px rgba(0,0,0,.34);}
+.ga-glucosia-hero{width:100%;overflow:hidden;border:1px solid rgba(212,175,55,.72);border-radius:22px;margin:0 0 20px;background:#080808;box-shadow:0 20px 48px rgba(0,0,0,.34);}
 .ga-glucosia-hero img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;}
+.ga-onboarding-hero{width:100%;max-width:390px;margin:0 auto 22px;align-self:center;}
+html.ga-premium #root>div:not(:has(nav)) h1{font-size:2rem!important;line-height:2.35rem!important;color:var(--ga-white)!important;letter-spacing:.01em;}
+html.ga-premium #root>div:not(:has(nav)) p{color:var(--ga-muted)!important;}
 .ga-recipe-thumb{width:92px!important;height:72px!important;min-width:92px!important;border-radius:15px!important;background-size:cover!important;background-position:center!important;border:1px solid rgba(212,175,55,.65)!important;overflow:hidden;}
 .ga-recipe-thumb svg{display:none!important;}
 .ga-recipe-card{padding:12px!important;gap:14px!important;border-color:#5b4814!important;}
@@ -39,5 +42,5 @@ html.ga-premium .fixed.inset-0 [class*="bg-white"]{background:var(--ga-surface)!
 .ga-assistant-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;}.ga-assistant-logo{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--ga-gold);color:var(--ga-gold2);font-weight:900;font-size:18px;background:#17130a;}.ga-assistant-title{flex:1}.ga-assistant-title strong{display:block;font-size:19px}.ga-assistant-title span{font-size:14px;color:#c9c9c9}.ga-assistant-close{width:46px;height:46px;border-radius:13px;border:1px solid #5d4b18;background:#17130a;color:#fff;font-size:22px;}
 #ga-assistant-response{padding:14px;border-radius:15px;background:#181818;border:1px solid #493b13;font-size:16px;line-height:1.55;margin:12px 0;min-height:56px;}
 .ga-assistant-controls{display:grid;grid-template-columns:1fr 54px;gap:9px}.ga-assistant-controls input{width:100%;border:1px solid #65511a;border-radius:14px;padding:11px 13px;background:#0a0a0a;color:#fff;font-size:16px}.ga-assistant-mic{width:54px;height:54px;min-height:54px;border-radius:14px;border:1px solid var(--ga-gold);background:#211a08;color:var(--ga-gold2);font-size:22px}.ga-assistant-send{width:100%;margin-top:9px;border:none;border-radius:14px;padding:13px 16px;background:linear-gradient(135deg,#f1d36d,#b68a16);color:#090909;font-weight:900;font-size:16px}.ga-assistant-hint{font-size:13px;line-height:1.45;color:#c7c7c7;margin-top:10px}.ga-listening{animation:gaPulse 1.1s infinite}@keyframes gaPulse{50%{box-shadow:0 0 0 9px rgba(212,175,55,.2)}}
-@media(max-width:390px){.ga-glucosia-hero{border-radius:17px;margin-bottom:15px}.ga-recipe-thumb{width:78px!important;height:66px!important;min-width:78px!important}#ga-glucosia-assistant-fab{right:14px;bottom:92px}}
+@media(max-width:390px){.ga-glucosia-hero{border-radius:17px;margin-bottom:15px}.ga-onboarding-hero{max-width:350px}.ga-recipe-thumb{width:78px!important;height:66px!important;min-width:78px!important}#ga-glucosia-assistant-fab{right:14px;bottom:92px}}
 @media print{html.ga-premium,html.ga-premium body{background:#fff!important;color:#111!important}html.ga-premium .bg-white{background:#fff!important}html.ga-premium .text-slate-900,html.ga-premium .text-slate-800,html.ga-premium .text-slate-700,html.ga-premium .text-slate-600,html.ga-premium .text-slate-500{color:#111!important}#ga-glucosia-assistant-fab,#ga-glucosia-assistant-panel,.ga-glucosia-hero{display:none!important}}
