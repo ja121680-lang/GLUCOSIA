@@ -3,8 +3,85 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta name="theme-color" content="#0B0B0B" />
     <title>Glucosia</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* ==========================================================
+         GA APP STANDARD 2026 — Glucosia
+         Black #0B0B0B · GA Gold #D4AF37 · White #F8F8F8
+         Keeps semantic red/green health states unchanged.
+         ========================================================== */
+      :root {
+        color-scheme: dark;
+        --ga-black: #0B0B0B;
+        --ga-surface: #141414;
+        --ga-surface-2: #1C1C1C;
+        --ga-gold: #D4AF37;
+        --ga-gold-deep: #B8860B;
+        --ga-gold-soft: #241D08;
+        --ga-white: #F8F8F8;
+        --ga-muted: #B8B8B8;
+        --ga-border: #343434;
+      }
+      html, body, #root { background: var(--ga-black) !important; color: var(--ga-white); min-height: 100%; }
+      body { margin: 0; }
+
+      /* Replace legacy slate/indigo/amber brand surfaces with GA surfaces. */
+      .bg-white, .bg-slate-50 { background-color: var(--ga-surface) !important; }
+      .bg-slate-100, .bg-slate-200 { background-color: var(--ga-surface-2) !important; }
+      .bg-slate-800, .bg-slate-900, .bg-indigo-800, .bg-indigo-900 { background-color: var(--ga-black) !important; }
+      .bg-yellow-50, .bg-yellow-100, .bg-amber-50, .bg-amber-100 { background-color: var(--ga-gold-soft) !important; }
+      .bg-yellow-400, .bg-yellow-500, .bg-yellow-600,
+      .bg-amber-400, .bg-amber-500, .bg-amber-600 { background-color: var(--ga-gold) !important; color: var(--ga-black) !important; }
+
+      /* Tailwind gradients — preserve depth, replace old blue/yellow palette. */
+      .from-slate-100, .from-slate-50 { --tw-gradient-from: var(--ga-black) var(--tw-gradient-from-position) !important; --tw-gradient-to: rgb(11 11 11 / 0) var(--tw-gradient-to-position) !important; }
+      .via-slate-50, .via-slate-100 { --tw-gradient-to: rgb(20 20 20 / 0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--ga-surface) var(--tw-gradient-via-position), var(--tw-gradient-to) !important; }
+      .to-amber-50, .to-amber-100 { --tw-gradient-to: var(--ga-black) var(--tw-gradient-to-position) !important; }
+      .from-slate-900 { --tw-gradient-from: var(--ga-black) var(--tw-gradient-from-position) !important; --tw-gradient-to: rgb(11 11 11 / 0) var(--tw-gradient-to-position) !important; }
+      .via-indigo-900, .via-indigo-800 { --tw-gradient-to: rgb(28 28 28 / 0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--ga-surface-2) var(--tw-gradient-via-position), var(--tw-gradient-to) !important; }
+      .to-slate-900 { --tw-gradient-to: var(--ga-black) var(--tw-gradient-to-position) !important; }
+      .from-yellow-400, .from-yellow-500 { --tw-gradient-from: var(--ga-gold) var(--tw-gradient-from-position) !important; --tw-gradient-to: rgb(212 175 55 / 0) var(--tw-gradient-to-position) !important; }
+      .to-yellow-500, .to-yellow-600 { --tw-gradient-to: var(--ga-gold-deep) var(--tw-gradient-to-position) !important; }
+
+      /* Typography. */
+      .text-slate-950, .text-slate-900, .text-slate-800, .text-slate-700 { color: var(--ga-white) !important; }
+      .text-slate-600, .text-slate-500, .text-slate-400, .text-slate-300 { color: var(--ga-muted) !important; }
+      .text-yellow-300, .text-yellow-400, .text-yellow-500, .text-yellow-600, .text-yellow-700,
+      .text-amber-400, .text-amber-500, .text-amber-600, .text-indigo-500, .text-indigo-600 { color: var(--ga-gold) !important; }
+
+      /* Cards, borders and controls. */
+      .border-slate-50, .border-slate-100, .border-slate-200, .border-slate-300, .border-slate-700, .border-slate-800 { border-color: var(--ga-border) !important; }
+      .border-yellow-200, .border-yellow-300, .border-yellow-400, .border-yellow-500,
+      .border-amber-300, .border-amber-400 { border-color: var(--ga-gold) !important; }
+      input, select, textarea {
+        background: var(--ga-surface-2) !important;
+        color: var(--ga-white) !important;
+        border-color: var(--ga-border) !important;
+      }
+      input::placeholder, textarea::placeholder { color: #8E8E8E !important; opacity: 1; }
+      input:focus, select:focus, textarea:focus { border-color: var(--ga-gold) !important; box-shadow: 0 0 0 3px rgba(212,175,55,.16) !important; outline: none !important; }
+
+      /* Primary CTA treatment. */
+      button[class*="from-yellow-"], button[class*="bg-yellow-"],
+      button[class*="from-amber-"], button[class*="bg-amber-"] {
+        color: var(--ga-black) !important;
+        font-weight: 700;
+      }
+
+      /* Keep modal/card elevation premium and neutral. */
+      .shadow, .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+        --tw-shadow-color: rgba(0,0,0,.45) !important;
+      }
+
+      /* Accesibilidad: foco visible GA en todos los elementos interactivos. */
+      a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+        outline: 3px solid var(--ga-gold) !important;
+        outline-offset: 2px;
+        border-radius: 8px;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

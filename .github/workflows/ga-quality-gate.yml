@@ -1,0 +1,38 @@
+name: GA Quality Gate
+
+on:
+  push:
+    branches:
+      - claude/autonomous-app-production
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build production bundle
+        run: npm run build
+      - name: Validate production bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dist/index.html
+          test -s dist/index.html
+          find dist -maxdepth 2 -type f | sort
+      - name: Upload Glucosia web release
+        uses: actions/upload-artifact@v4
+        with:
+          name: glucosia-web-release
+          path: dist
+          if-no-files-found: error
+          retention-days: 90
