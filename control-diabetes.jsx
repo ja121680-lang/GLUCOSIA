@@ -457,8 +457,8 @@ function WelcomeStep({ onStart }) {
         <p className="text-sm text-slate-500 mt-2 max-w-[260px]">Seguimiento claro de glucosa, medicamentos y citas, con accesibilidad y control de tus datos.</p>
       </div>
       <div className="pb-6">
-        <button type="button" onClick={onStart} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 font-semibold py-3.5 rounded-xl">Regístrate para acceder</button>
-        <p className="text-xs text-slate-300 text-center mt-4">Al continuar aceptas nuestros términos y el aviso de privacidad.</p>
+        <button type="button" onClick={onStart} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 font-semibold py-3.5 rounded-xl">Crear perfil</button>
+        <p className="text-xs text-slate-300 text-center mt-4">Esta versión guarda la información en el almacenamiento local del navegador.</p>
       </div>
     </div>
   );
@@ -472,10 +472,10 @@ function CookiesStep({ onAccept }) {
           <ShieldCheck size={28} className="text-slate-400" />
         </div>
         <h1 className="text-2xl font-bold text-slate-900">Tu privacidad importa</h1>
-        <p className="text-sm text-slate-500 mt-2 max-w-[280px]">Usamos cookies y almacenamiento local para guardar tus datos de salud en este dispositivo y mejorar tu experiencia dentro de Glucosia.</p>
+        <p className="text-sm text-slate-500 mt-2 max-w-[280px]">Glucosia usa el almacenamiento local del navegador para guardar tus datos de salud en este dispositivo. Esta versión no necesita cookies para registrar tus lecturas.</p>
       </div>
       <div className="pb-6">
-        <button type="button" onClick={onAccept} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 font-semibold py-3.5 rounded-xl">Aceptar todas las cookies</button>
+        <button type="button" onClick={onAccept} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 font-semibold py-3.5 rounded-xl">Continuar</button>
       </div>
     </div>
   );
