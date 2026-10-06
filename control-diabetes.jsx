@@ -300,14 +300,29 @@ function nowTimeStr() {
   const d = new Date();
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
-function formatDateShort(dateStr) {
-  const parts = dateStr.split('-');
-  return `${parts[2]}/${parts[1]}`;
+const APP_LOCALES = { es: 'es-MX', en: 'en-US', pt: 'pt-BR', fr: 'fr-FR', it: 'it-IT', de: 'de-DE', zh: 'zh-CN' };
+function storedLanguage() {
+  try {
+    const raw = localStorage.getItem('app-language');
+    return raw ? JSON.parse(raw) : 'es';
+  } catch (e) {
+    return 'es';
+  }
 }
-const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+function localeDate(dateStr) {
+  const parts = String(dateStr || '').split('-').map(Number);
+  if (parts.length !== 3 || parts.some((n) => !Number.isFinite(n))) return null;
+  return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+function formatDateShort(dateStr) {
+  const date = localeDate(dateStr);
+  if (!date) return dateStr || '';
+  return new Intl.DateTimeFormat(APP_LOCALES[storedLanguage()] || APP_LOCALES.es, { day: '2-digit', month: '2-digit' }).format(date);
+}
 function formatDateLong(dateStr) {
-  const parts = dateStr.split('-').map(Number);
-  return `${parts[2]} de ${MESES[parts[1] - 1]} de ${parts[0]}`;
+  const date = localeDate(dateStr);
+  if (!date) return dateStr || '';
+  return new Intl.DateTimeFormat(APP_LOCALES[storedLanguage()] || APP_LOCALES.es, { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
 }
 
 async function loadKey(key, fallback) {
