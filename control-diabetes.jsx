@@ -325,6 +325,20 @@ function formatDateLong(dateStr) {
   return new Intl.DateTimeFormat(APP_LOCALES[storedLanguage()] || APP_LOCALES.es, { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
 }
 
+const DELETE_CONFIRM = {
+  es: '¿Seguro que quieres eliminar este registro? Esta acción no se puede deshacer.',
+  en: 'Are you sure you want to delete this record? This action cannot be undone.',
+  pt: 'Tem certeza de que deseja excluir este registro? Esta ação não pode ser desfeita.',
+  fr: 'Voulez-vous vraiment supprimer cet élément ? Cette action est irréversible.',
+  it: 'Vuoi davvero eliminare questo elemento? Questa azione non può essere annullata.',
+  de: 'Möchtest du diesen Eintrag wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+  zh: '确定要删除这条记录吗？此操作无法撤销。',
+};
+function confirmDeletion() {
+  if (typeof window === 'undefined' || typeof window.confirm !== 'function') return true;
+  return window.confirm(DELETE_CONFIRM[storedLanguage()] || DELETE_CONFIRM.es);
+}
+
 async function loadKey(key, fallback) {
   try {
     const raw = localStorage.getItem(key);
@@ -2110,6 +2124,7 @@ export default function ControlDiabetesApp() {
     showToast('Lectura guardada');
   }
   async function deleteGlucoseReading(id) {
+    if (!confirmDeletion()) return;
     const updated = glucose.filter((g) => g.id !== id);
     setGlucose(updated);
     await saveKey(STORAGE_KEYS.glucose, updated);
@@ -2124,6 +2139,7 @@ export default function ControlDiabetesApp() {
     showToast('Lectura guardada');
   }
   async function deletePressureReading(id) {
+    if (!confirmDeletion()) return;
     const updated = pressure.filter((p) => p.id !== id);
     setPressure(updated);
     await saveKey(STORAGE_KEYS.pressure, updated);
@@ -2139,6 +2155,7 @@ export default function ControlDiabetesApp() {
     showToast('Medicamento guardado');
   }
   async function deleteMedication(id) {
+    if (!confirmDeletion()) return;
     const updated = medications.filter((m) => m.id !== id);
     setMedications(updated);
     await saveKey(STORAGE_KEYS.medications, updated);
@@ -2176,6 +2193,7 @@ export default function ControlDiabetesApp() {
     showToast('Cita guardada');
   }
   async function deleteAppointment(id) {
+    if (!confirmDeletion()) return;
     const updated = appointments.filter((a) => a.id !== id);
     setAppointments(updated);
     await saveKey(STORAGE_KEYS.appointments, updated);
@@ -2190,6 +2208,7 @@ export default function ControlDiabetesApp() {
     showToast('Estudio guardado');
   }
   async function deleteLabStudy(id) {
+    if (!confirmDeletion()) return;
     const updated = labStudies.filter((l) => l.id !== id);
     setLabStudies(updated);
     await saveKey(STORAGE_KEYS.labStudies, updated);
