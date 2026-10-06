@@ -1338,7 +1338,7 @@ function MedicalExportModal({ profile, glucose, pressure, medications, appointme
             ) : (
               <div className="space-y-1">
                 {medications.map((m) => (
-                  <p key={m.id} className="text-xs text-slate-600">{m.nombre} — {m.dosis || 'sin dosis especificada'}{m.frecuencia ? ` · ${m.frecuencia}` : ''}</p>
+                  <p key={m.id} className="text-xs text-slate-600">{m.nombre} — {m.dosis || 'sin dosis especificada'}{(m.horarios || []).length ? ` · Horarios: ${m.horarios.join(', ')}` : ''}</p>
                 ))}
               </div>
             )}
