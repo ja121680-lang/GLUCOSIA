@@ -1532,7 +1532,7 @@ function RecetasView({ recipes, favorites, onSelect, onToggleFavorite }) {
           {shown.map((r) => {
             const isFav = favorites.includes(r.id);
             return (
-              <button key={r.id} onClick={() => onSelect(r)} className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-3.5 flex items-center gap-3 text-left">
+              <div key={r.id} role="button" tabIndex={0} onClick={() => onSelect(r)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(r); } }} className="w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-3.5 flex items-center gap-3 text-left cursor-pointer">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-600 to-slate-900 flex items-center justify-center flex-shrink-0">
                   <UtensilsCrossed size={18} className="text-white" />
                 </div>
@@ -1540,10 +1540,10 @@ function RecetasView({ recipes, favorites, onSelect, onToggleFavorite }) {
                   <p className="font-semibold text-slate-900 truncate">{r.nombre}</p>
                   <p className="text-xs text-slate-500 mt-0.5">{r.tiempo} · {r.calorias} kcal · {r.carbohidratos} g carbs</p>
                 </div>
-                <button type="button" onClick={(e) => { e.stopPropagation(); onToggleFavorite(r.id); }} className="flex-shrink-0">
+                <button type="button" aria-label={isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'} onClick={(e) => { e.stopPropagation(); onToggleFavorite(r.id); }} className="flex-shrink-0">
                   <Star size={18} className={isFav ? 'text-yellow-400' : 'text-slate-200'} fill={isFav ? 'currentColor' : 'none'} />
                 </button>
-              </button>
+              </div>
             );
           })}
         </div>
